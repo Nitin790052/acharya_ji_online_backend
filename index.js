@@ -1,8 +1,10 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const path = require('path');
 const connectDB = require('./config/db');
 const navbarRoutes = require('./routes/navbarRoutes');
+const heroBannerRoutes = require('./routes/heroBannerRoutes');
 
 dotenv.config();
 
@@ -14,9 +16,11 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/navbar', navbarRoutes);
+app.use('/api/hero-banners', heroBannerRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is running...');
