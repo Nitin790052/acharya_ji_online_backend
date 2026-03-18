@@ -22,28 +22,19 @@ exports.getActiveBanners = async (req, res) => {
 
 exports.createBanner = async (req, res) => {
     try {
-        const { badge, titleHighlight1, titleHighlight2, titleHighlight3, titleEnd, subtitle, linkText, linkUrl, pagePath, isActive } = req.body;
-        
         if (!req.file) {
             return res.status(400).json({ message: 'Image is required' });
         }
 
         const imageUrl = `/uploads/carousels/${req.file.filename}`;
+        const bannerData = { ...req.body, imageUrl };
 
-        const newBanner = new HeroBanner({
-            badge,
-            titleHighlight1,
-            titleHighlight2,
-            titleHighlight3,
-            titleEnd,
-            subtitle,
-            linkText,
-            linkUrl,
-            imageUrl,
-            pagePath: pagePath || '/',
-            isActive: isActive === 'true' || isActive === true
-        });
+        // Ensure proper boolean conversion for isActive
+        if (bannerData.isActive !== undefined) {
+            bannerData.isActive = bannerData.isActive === 'true' || bannerData.isActive === true;
+        }
 
+        const newBanner = new HeroBanner(bannerData);
         await newBanner.save();
         res.status(201).json({ message: 'Banner created successfully', banner: newBanner });
     } catch (error) {

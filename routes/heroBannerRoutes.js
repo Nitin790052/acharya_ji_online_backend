@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const heroBannerController = require('../controllers/heroBannerController');
+const { validateBanner } = require('../middleware/validate');
 
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, '..', 'uploads', 'carousels');
@@ -24,8 +25,8 @@ const upload = multer({ storage: storage });
 
 router.get('/', heroBannerController.getAllBanners);
 router.get('/active', heroBannerController.getActiveBanners);
-router.post('/', upload.single('image'), heroBannerController.createBanner);
-router.put('/:id', upload.single('image'), heroBannerController.updateBanner);
+router.post('/', upload.single('image'), validateBanner, heroBannerController.createBanner);
+router.put('/:id', upload.single('image'), validateBanner, heroBannerController.updateBanner);
 router.delete('/:id', heroBannerController.deleteBanner);
 
 module.exports = router;
