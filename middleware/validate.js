@@ -38,7 +38,17 @@ const validateNavbar = [
     validateResult
 ];
 
+// Popular Puja validation
+const validatePopularPuja = [
+    body('name').trim().notEmpty().withMessage('Name is required'),
+    body('description').trim().notEmpty().withMessage('Description is required'),
+    body('duration').trim().notEmpty().withMessage('Duration is required'),
+    body('price').trim().notEmpty().withMessage('Price is required'),
+    validateResult
+];
+
 module.exports = {
     validateBanner,
-    validateNavbar
+    validateNavbar,
+    validatePopularPuja
 };

@@ -7,6 +7,10 @@ const navbarRoutes = require('./routes/navbarRoutes');
 const heroBannerRoutes = require('./routes/heroBannerRoutes');
 const aboutUsRoutes = require('./routes/aboutUsRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
+const popularPujaRoutes = require('./routes/popularPujaRoutes');
+const astrologerRoutes = require('./routes/astrologerRoutes');
+const kundliRoutes = require('./routes/kundliRoutes');
+const vastuRoutes = require('./routes/vastuRoutes');
 
 dotenv.config();
 
@@ -25,6 +29,10 @@ app.use('/api/navbar', navbarRoutes);
 app.use('/api/hero-banners', heroBannerRoutes);
 app.use('/api/about-us', aboutUsRoutes);
 app.use('/api/services', serviceRoutes);
+app.use('/api/popular-pujas', popularPujaRoutes);
+app.use('/api/astrologers', astrologerRoutes);
+app.use('/api/kundli-services', kundliRoutes);
+app.use('/api/vastu-services', vastuRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is running...');
