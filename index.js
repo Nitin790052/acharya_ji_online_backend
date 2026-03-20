@@ -11,6 +11,12 @@ const popularPujaRoutes = require('./routes/popularPujaRoutes');
 const astrologerRoutes = require('./routes/astrologerRoutes');
 const kundliRoutes = require('./routes/kundliRoutes');
 const vastuRoutes = require('./routes/vastuRoutes');
+const testimonialRoutes = require('./routes/testimonialRoutes');
+const blogRoutes = require('./routes/blogRoutes');
+
+const appDownloadRoutes = require('./routes/appDownloadRoutes');
+const faqRoutes = require('./routes/faqRoutes');
+const footerRoutes = require('./routes/footerRoutes');
 
 dotenv.config();
 
@@ -33,6 +39,11 @@ app.use('/api/popular-pujas', popularPujaRoutes);
 app.use('/api/astrologers', astrologerRoutes);
 app.use('/api/kundli-services', kundliRoutes);
 app.use('/api/vastu-services', vastuRoutes);
+app.use('/api/testimonials', testimonialRoutes);
+app.use('/api/blogs', blogRoutes);
+app.use('/api/app-download', appDownloadRoutes);
+app.use('/api/faqs', faqRoutes);
+app.use('/api/footer', footerRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is running...');
