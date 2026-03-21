@@ -4,8 +4,8 @@ const { body, validationResult } = require('express-validator');
 const validateResult = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
-            success: false, 
+        return res.status(400).json({
+            success: false,
             message: 'Validation failed',
             errors: errors.array().map(err => ({ field: err.path, message: err.msg }))
         });
@@ -17,14 +17,14 @@ const validateResult = (req, res, next) => {
 const validateBanner = [
     // badge is optional but can't be empty if provided
     body('badge').optional().trim().notEmpty().withMessage('Badge cannot be empty'),
-    
+
     // titleHighlight1 is now optional per user request
     body('titleHighlight1').optional().trim(),
-    
+
     // titleHighlight2, 3 and subtitle are usually core content
     body('titleHighlight2').trim().notEmpty().withMessage('Title Highlight 1 is required'),
     body('subtitle').trim().notEmpty().withMessage('Subtitle is required'),
-    
+
     // Image validation is usually done in controller (check if req.file exists)
     // but we can ensure other fields are there
     validateResult

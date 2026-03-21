@@ -17,6 +17,7 @@ const blogRoutes = require('./routes/blogRoutes');
 const appDownloadRoutes = require('./routes/appDownloadRoutes');
 const faqRoutes = require('./routes/faqRoutes');
 const footerRoutes = require('./routes/footerRoutes');
+const aboutPageRoutes = require('./routes/aboutPageRoutes');
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.use('/api/blogs', blogRoutes);
 app.use('/api/app-download', appDownloadRoutes);
 app.use('/api/faqs', faqRoutes);
 app.use('/api/footer', footerRoutes);
+app.use('/api/about-page', aboutPageRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is running...');
