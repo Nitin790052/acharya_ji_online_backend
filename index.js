@@ -18,6 +18,7 @@ const appDownloadRoutes = require('./routes/appDownloadRoutes');
 const faqRoutes = require('./routes/faqRoutes');
 const footerRoutes = require('./routes/footerRoutes');
 const aboutPageRoutes = require('./routes/aboutPageRoutes');
+const pujaOfferingRoutes = require('./routes/pujaOfferingRoutes');
 
 dotenv.config();
 
@@ -46,6 +47,7 @@ app.use('/api/app-download', appDownloadRoutes);
 app.use('/api/faqs', faqRoutes);
 app.use('/api/footer', footerRoutes);
 app.use('/api/about-page', aboutPageRoutes);
+app.use('/api/puja-offerings', pujaOfferingRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is running...');

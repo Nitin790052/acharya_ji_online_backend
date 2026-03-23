@@ -24,5 +24,6 @@ router.post('/', upload.single('image'), serviceController.createService);
 router.put('/:id', upload.single('image'), serviceController.updateService);
 router.post('/toggle-active/:id', serviceController.toggleActiveService);
 router.delete('/:id', serviceController.deleteService);
+router.post('/seed', serviceController.seedServices);
 
 module.exports = router;

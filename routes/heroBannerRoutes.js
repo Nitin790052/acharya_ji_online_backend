@@ -25,8 +25,9 @@ const upload = multer({ storage: storage });
 
 router.get('/', heroBannerController.getAllBanners);
 router.get('/active', heroBannerController.getActiveBanners);
-router.post('/', upload.single('image'), validateBanner, heroBannerController.createBanner);
-router.put('/:id', upload.single('image'), validateBanner, heroBannerController.updateBanner);
+router.post('/', upload.single('image'), heroBannerController.createBanner);
+router.put('/:id', upload.single('image'), heroBannerController.updateBanner);
 router.delete('/:id', heroBannerController.deleteBanner);
+router.post('/seed', heroBannerController.seedBanners);
 
 module.exports = router;

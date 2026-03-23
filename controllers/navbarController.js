@@ -22,15 +22,15 @@ const seedNavbarItems = async (req, res) => {
             order: 3,
             children: [
                 { label: 'Book Puja', href: '/pujaServices/bookPuja' },
-                { label: 'Griha Pravesh Puja', href: '/pujaServices/girhaPraveshPuja' },
-                { label: 'Satyanarayan Katha', href: '#' },
-                { label: 'Rudrabhishek', href: '#' },
-                { label: 'Navgraha Shanti Puja', href: '#' },
-                { label: 'Vastu Shanti Puja', href: '#' },
-                { label: 'Marriage / Vivah Puja', href: '#' },
-                { label: 'Pitru Dosh Puja', href: '#' },
-                { label: 'Havan & Yagya', href: '#' },
-                { label: 'All Puja Services', href: '#' }
+                { label: 'Griha Pravesh Puja', href: '/puja/griha-pravesh-puja' },
+                { label: 'Satyanarayan Katha', href: '/puja/satyanarayan-puja' },
+                { label: 'Rudrabhishek', href: '/puja/rudrabhishek-puja' },
+                { label: 'Navgraha Shanti Puja', href: '/puja/navgraha-shanti-puja' },
+                { label: 'Vastu Shanti Puja', href: '/puja/vastu-shanti-puja' },
+                { label: 'Marriage / Vivah Puja', href: '/puja/marriage-puja' },
+                { label: 'Pitru Dosh Puja', href: '/puja/pitru-dosh-puja' },
+                { label: 'Havan & Yagya', href: '/puja/havan-yagya' },
+                { label: 'All Puja Services', href: '/pujaServices' }
             ]
         },
         {

@@ -15,18 +15,15 @@ const validateResult = (req, res, next) => {
 
 // Banner validation rules
 const validateBanner = [
-    // badge is optional but can't be empty if provided
-    body('badge').optional().trim().notEmpty().withMessage('Badge cannot be empty'),
-
-    // titleHighlight1 is now optional per user request
-    body('titleHighlight1').optional().trim(),
-
-    // titleHighlight2, 3 and subtitle are usually core content
-    body('titleHighlight2').trim().notEmpty().withMessage('Title Highlight 1 is required'),
-    body('subtitle').trim().notEmpty().withMessage('Subtitle is required'),
-
-    // Image validation is usually done in controller (check if req.file exists)
-    // but we can ensure other fields are there
+    body('badge').optional({ checkFalsy: true }).trim(),
+    body('titleHighlight1').optional({ checkFalsy: true }).trim(),
+    body('titleHighlight2').optional({ checkFalsy: true }).trim(),
+    body('titleHighlight3').optional({ checkFalsy: true }).trim(),
+    body('titleEnd').optional({ checkFalsy: true }).trim(),
+    body('subtitle').optional({ checkFalsy: true }).trim(),
+    body('linkText').optional({ checkFalsy: true }).trim(),
+    body('linkUrl').optional({ checkFalsy: true }).trim(),
+    body('pagePath').optional({ checkFalsy: true }).trim(),
     validateResult
 ];
 

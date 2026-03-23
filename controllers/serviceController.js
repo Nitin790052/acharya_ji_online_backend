@@ -32,7 +32,7 @@ exports.createService = async (req, res) => {
     try {
         const imageUrl = req.file ? `/uploads/services/${req.file.filename}` : '';
         const { title, description, href, category, icon, order } = req.body;
-        
+
         const service = await Service.create({
             title,
             description,
@@ -122,5 +122,36 @@ exports.deleteService = async (req, res) => {
         res.status(200).json({ message: 'Service deleted' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting service' });
+    }
+};
+
+// @desc    Seed services
+// @route   POST /api/services/seed
+exports.seedServices = async (req, res) => {
+    try {
+        await Service.deleteMany({}); // Optional: clear existing
+        
+        const sampleServices = [
+            // Core Services
+            { title: 'Puja Services', description: 'Online & Offline Puja', href: '/puja', icon: 'Flame', category: 'core', order: 1, isActive: true, imageUrl: 'https://images.unsplash.com/photo-1561059488-916d69792237?w=800' },
+            { title: 'Astrology Consultation', description: 'Expert Astrologers', href: '/astrology', icon: 'Moon', category: 'core', order: 2, isActive: true, imageUrl: 'https://images.unsplash.com/photo-1561059488-916d69792237?w=800' },
+            { title: 'Kundli Services', description: 'Birth Chart Analysis', href: '/kundli', icon: 'ScrollText', category: 'core', order: 3, isActive: true, imageUrl: 'https://images.unsplash.com/photo-1561059488-916d69792237?w=800' },
+            { title: 'Vastu & Remedies', description: 'Space Harmonization', href: '/vastu', icon: 'Shield', category: 'core', order: 4, isActive: true, imageUrl: 'https://images.unsplash.com/photo-1561059488-916d69792237?w=800' },
+            { title: 'Healing & Spiritual', description: 'Energy Cleansing', href: '/spiritual', icon: 'Leaf', category: 'core', order: 5, isActive: true, imageUrl: 'https://images.unsplash.com/photo-1561059488-916d69792237?w=800' },
+            { title: 'Shop', description: 'Samagri & Gemstones', href: '/shop', icon: 'ShoppingCart', category: 'core', order: 6, isActive: true, imageUrl: 'https://images.unsplash.com/photo-1561059488-916d69792237?w=800' },
+
+            // Detailed Services
+            { title: 'Online Puja', description: 'Live virtual ceremonies conducted by experienced priests from sacred locations.', href: '/puja/online', icon: 'Video', category: 'detailed', order: 1, isActive: true, imageUrl: 'https://images.unsplash.com/photo-1561059488-916d69792237?w=800' },
+            { title: 'Home Visit Puja', description: 'Authentic rituals performed at your home by our certified pandits.', href: '/puja/offline', icon: 'Home', category: 'detailed', order: 2, isActive: true, imageUrl: 'https://images.unsplash.com/photo-1561059488-916d69792237?w=800' },
+            { title: 'Special Anushthan', description: 'Elaborate multi-day ceremonies for major life events and wishes.', href: '/puja/anushthan', icon: 'Star', category: 'detailed', order: 3, isActive: true, imageUrl: 'https://images.unsplash.com/photo-1561059488-916d69792237?w=800' },
+            { title: 'Puja Samagri', description: 'Premium quality puja items sourced from authentic suppliers.', href: '/samagri/essentials', icon: 'Package', category: 'detailed', order: 4, isActive: true, imageUrl: 'https://images.unsplash.com/photo-1561059488-916d69792237?w=800' },
+            { title: 'Prasad Delivery', description: 'Sacred offerings delivered fresh to your doorstep from temples.', href: '/products/prasad', icon: 'Truck', category: 'detailed', order: 5, isActive: true, imageUrl: 'https://images.unsplash.com/photo-1561059488-916d69792237?w=800' },
+            { title: 'Festival Specials', description: 'Curated packages for festivals with all essential items.', href: '/products/festival', icon: 'Gift', category: 'detailed', order: 6, isActive: true, imageUrl: 'https://images.unsplash.com/photo-1561059488-916d69792237?w=800' }
+        ];
+
+        const createdServices = await Service.insertMany(sampleServices);
+        res.status(201).json({ message: 'Services seeded successfully', count: createdServices.length });
+    } catch (error) {
+        res.status(500).json({ message: 'Error seeding services', error: error.message });
     }
 };
