@@ -17,7 +17,6 @@ const seedNavbarItems = async (req, res) => {
         { label: 'About Us', href: '/about', order: 2 },
         {
             label: 'Puja Services',
-            href: '/pujaServices',
             type: 'dropdown',
             order: 3,
             children: [
