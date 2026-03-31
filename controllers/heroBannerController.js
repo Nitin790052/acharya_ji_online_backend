@@ -159,6 +159,18 @@ exports.seedBanners = async (req, res) => {
                 imageUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1200',
                 pagePath: '/puja',
                 isActive: true
+            },
+            {
+                badge: 'DIVINE SERVICES HUB',
+                titleHighlight1: 'Explore Sacred',
+                titleHighlight2: 'Spiritual',
+                titleHighlight3: 'Insights',
+                titleEnd: '',
+                subtitle: 'Authentic insights on Puja, Astrology & Vedic traditions curated for your spiritual growth.',
+                buttons: [{ text: 'Read Latest', link: '/blog' }],
+                imageUrl: 'https://images.unsplash.com/photo-1490730141103-6ca27d92471?w=1200',
+                pagePath: '/blog',
+                isActive: true
             }
         ];
         await HeroBanner.insertMany(sampleBanners);
