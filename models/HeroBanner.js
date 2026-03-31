@@ -19,20 +19,18 @@ const heroBannerSchema = new mongoose.Schema({
     },
     titleEnd: {
         type: String,
-        default: 'At Your Doorstep',
+        default: '',
     },
     subtitle: {
         type: String,
         default: 'Connect with sacred traditions through authentic rituals, expert consultations, and premium spiritual essentials delivered with devotion.',
     },
-    linkText: {
-        type: String,
-        default: '',
-    },
-    linkUrl: {
-        type: String,
-        default: '',
-    },
+    buttons: [
+        {
+            text: String,
+            link: String
+        }
+    ],
     imageUrl: {
         type: String,
         required: true,

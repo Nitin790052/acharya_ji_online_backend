@@ -29,6 +29,15 @@ exports.createBanner = async (req, res) => {
         const imageUrl = `/uploads/carousels/${req.file.filename}`;
         const bannerData = { ...req.body, imageUrl };
 
+        // Handle buttons array if passed as JSON string
+        if (typeof bannerData.buttons === 'string') {
+            try {
+                bannerData.buttons = JSON.parse(bannerData.buttons);
+            } catch (e) {
+                bannerData.buttons = [];
+            }
+        }
+
         // Ensure proper boolean conversion for isActive
         if (bannerData.isActive !== undefined) {
             bannerData.isActive = bannerData.isActive === 'true' || bannerData.isActive === true;
@@ -46,6 +55,15 @@ exports.updateBanner = async (req, res) => {
     try {
         const { id } = req.params;
         const updates = { ...req.body };
+
+        // Handle buttons array if passed as JSON string
+        if (typeof updates.buttons === 'string') {
+            try {
+                updates.buttons = JSON.parse(updates.buttons);
+            } catch (e) {
+                updates.buttons = [];
+            }
+        }
 
         if (updates.isActive !== undefined) {
             updates.isActive = updates.isActive === 'true' || updates.isActive === true;
