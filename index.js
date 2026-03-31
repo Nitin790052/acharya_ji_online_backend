@@ -22,6 +22,7 @@ const pujaOfferingRoutes = require('./routes/pujaOfferingRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const bookPujaContentRoutes = require('./routes/bookPujaContentRoutes');
 const careerContentRoutes = require('./routes/careerContentRoutes');
+const mediaRoutes = require('./routes/mediaRoutes');
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.use('/api/puja-offerings', pujaOfferingRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/book-puja-content', bookPujaContentRoutes);
 app.use('/api/career-content', careerContentRoutes);
+app.use('/api/media', mediaRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is running...');
