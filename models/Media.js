@@ -27,6 +27,7 @@ const mediaSchema = new mongoose.Schema({
   duration: String,
   views: String,
   videoId: String,
+  video: String, // Path to stored video file
 
   // Event fields
   location: String,

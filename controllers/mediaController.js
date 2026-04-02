@@ -1,6 +1,8 @@
 const Media = require('../models/Media');
+const MediaSettings = require('../models/MediaSettings');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios'); // We'll assume axios is available or use fetch if on node 18+
 
 exports.getAllMedia = async (req, res) => {
     try {
@@ -25,8 +27,13 @@ exports.createMedia = async (req, res) => {
     try {
         const mediaData = { ...req.body };
         
-        if (req.file) {
-            mediaData.image = `/uploads/media/${req.file.filename}`;
+        if (req.files) {
+            if (req.files.image && req.files.image[0]) {
+                mediaData.image = `/uploads/media/${req.files.image[0].filename}`;
+            }
+            if (req.files.video && req.files.video[0]) {
+                mediaData.video = `/uploads/media/${req.files.video[0].filename}`;
+            }
         }
 
         const newMedia = new Media(mediaData);
@@ -42,15 +49,25 @@ exports.updateMedia = async (req, res) => {
         const { id } = req.params;
         const updates = { ...req.body };
 
-        if (req.file) {
-            updates.image = `/uploads/media/${req.file.filename}`;
-
-            // Delete old image
+        if (req.files) {
             const existingMedia = await Media.findById(id);
-            if (existingMedia && existingMedia.image && existingMedia.image.startsWith('/uploads/')) {
-                const oldImagePath = path.join(__dirname, '..', existingMedia.image);
-                if (fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath);
+            if (!existingMedia) return res.status(404).json({ message: 'Media not found' });
+
+            if (req.files.image && req.files.image[0]) {
+                updates.image = `/uploads/media/${req.files.image[0].filename}`;
+                // Delete old image
+                if (existingMedia.image && existingMedia.image.startsWith('/uploads/')) {
+                    const oldPath = path.join(__dirname, '..', existingMedia.image);
+                    if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+                }
+            }
+
+            if (req.files.video && req.files.video[0]) {
+                updates.video = `/uploads/media/${req.files.video[0].filename}`;
+                // Delete old video
+                if (existingMedia.video && existingMedia.video.startsWith('/uploads/')) {
+                    const oldPath = path.join(__dirname, '..', existingMedia.video);
+                    if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
                 }
             }
         }
@@ -76,10 +93,12 @@ exports.deleteMedia = async (req, res) => {
         }
 
         if (media.image && media.image.startsWith('/uploads/')) {
-            const imagePath = path.join(__dirname, '..', media.image);
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
-            }
+            const pathP = path.join(__dirname, '..', media.image);
+            if (fs.existsSync(pathP)) fs.unlinkSync(pathP);
+        }
+        if (media.video && media.video.startsWith('/uploads/')) {
+            const pathV = path.join(__dirname, '..', media.video);
+            if (fs.existsSync(pathV)) fs.unlinkSync(pathV);
         }
 
         await Media.findByIdAndDelete(id);
@@ -202,8 +221,154 @@ exports.seedMedia = async (req, res) => {
             }
         ];
         await Media.insertMany(sampleMedia);
-        res.status(201).json({ message: 'Media seeded successfully!' });
+
+        // Seed default stats
+        await MediaSettings.deleteMany();
+        const defaultStats = [
+            { value: '50K+', label: 'Subscribers', iconType: 'youtube' },
+            { value: '35K+', label: 'Followers', iconType: 'instagram' },
+            { value: '100+', label: 'Features', iconType: 'newspaper' },
+            { value: '25+', label: 'Public Events', iconType: 'users' }
+        ];
+        const defaultCTA = {
+            badge: 'SPIRITUAL CONNECTION',
+            title: 'EXPERIENCE THE',
+            titleHighlight: 'DIVINE GRACE',
+            description: "Join Acharya Ji's spiritual family and discover the profound impact of authentic Vedic rituals and divine guidance in your life.",
+            primaryBtnText: 'Book Sacred Puja',
+            primaryBtnLink: '/puja/online',
+            secondaryBtnText: 'Professional Consultation',
+            secondaryBtnLink: '/talk-to-astrologer'
+        };
+        const newSettings = new MediaSettings({ stats: defaultStats, cta: defaultCTA });
+        await newSettings.save();
+
+        res.status(201).json({ message: 'Media and Stats seeded successfully!' });
     } catch (error) {
         res.status(500).json({ message: 'Error seeding media', error: error.message });
+    }
+};
+
+exports.fetchYTMetadata = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const url = `https://www.youtube.com/watch?v=${id}`;
+        
+        console.log(`📡 Fetching metadata for Video ID: ${id}`);
+        
+        const response = await axios.get(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept-Language': 'en-US,en;q=0.9'
+            },
+            timeout: 8000
+        });
+
+        const html = response.data;
+        
+        // Use a more resilient regex to find the JSON response
+        const jsonMatch = html.match(/var ytInitialPlayerResponse\s*=\s*({[\s\S]*?});/);
+        let data = null;
+        
+        if (jsonMatch && jsonMatch[1]) {
+            try {
+                data = JSON.parse(jsonMatch[1]);
+            } catch (pErr) {
+                console.error("JSON Parse failed", pErr);
+            }
+        }
+
+        if (!data || !data.videoDetails) {
+            return res.status(404).json({ message: 'Could not fetch metadata (Format mismatch)' });
+        }
+
+        const details = data.videoDetails;
+        
+        // Convert seconds to MM:SS
+        const seconds = parseInt(details.lengthSeconds || 0);
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        const duration = seconds > 0 ? `${minutes}:${remainingSeconds.toString().padStart(2, '0')}` : "0:00";
+
+        // Format Views (e.g. 25000 -> 25K)
+        const viewCount = parseInt(details.viewCount || 0);
+        let views = viewCount.toString();
+        if (viewCount >= 1000000) views = (viewCount / 1000000).toFixed(1) + 'M';
+        else if (viewCount >= 1000) views = (viewCount / 1000).toFixed(1) + 'K';
+
+        // Get Date (microformat datePublished or publishedTimeText)
+        let formattedDate = "";
+        const dateMatch = html.match(/"datePublished":"([^"]+)"/);
+        const rawDate = dateMatch ? dateMatch[1] : null;
+        if (rawDate) {
+            const dateObj = new Date(rawDate);
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            formattedDate = `${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+        } else {
+            // Fallback for date
+            formattedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        const thumbnail = details.thumbnail.thumbnails.slice(-1)[0].url;
+
+        console.log(`✅ Successfully fetched metadata for: ${details.title}`);
+
+        res.status(200).json({
+            title: details.title,
+            views: views,
+            duration: duration,
+            date: formattedDate,
+            thumbnail: thumbnail
+        });
+    } catch (error) {
+        console.error('YT Fetch Error:', error.message);
+        res.status(500).json({ message: 'Error fetching metadata from YouTube', error: error.message });
+    }
+};
+
+exports.getMediaSettings = async (req, res) => {
+    try {
+        let settings = await MediaSettings.findOne();
+        if (!settings) {
+            // Default stats if none exist
+            const defaultStats = [
+                { value: '50K+', label: 'Subscribers', iconType: 'youtube' },
+                { value: '35K+', label: 'Followers', iconType: 'instagram' },
+                { value: '100+', label: 'Features', iconType: 'newspaper' },
+                { value: '25+', label: 'Public Events', iconType: 'users' }
+            ];
+            const defaultCTA = {
+                badge: 'SPIRITUAL CONNECTION',
+                title: 'EXPERIENCE THE',
+                titleHighlight: 'DIVINE GRACE',
+                description: "Join Acharya Ji's spiritual family and discover the profound impact of authentic Vedic rituals and divine guidance in your life.",
+                primaryBtnText: 'Book Sacred Puja',
+                primaryBtnLink: '/puja/online',
+                secondaryBtnText: 'Professional Consultation',
+                secondaryBtnLink: '/talk-to-astrologer'
+            };
+            settings = new MediaSettings({ stats: defaultStats, cta: defaultCTA });
+            await settings.save();
+        }
+        res.status(200).json(settings);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching media settings', error: error.message });
+    }
+};
+
+exports.updateMediaSettings = async (req, res) => {
+    try {
+        const { stats, cta } = req.body;
+        let settings = await MediaSettings.findOne();
+        if (settings) {
+            if (stats) settings.stats = stats;
+            if (cta) settings.cta = cta;
+        } else {
+            settings = new MediaSettings({ stats, cta });
+        }
+        await settings.save();
+        res.status(200).json({ message: 'Media settings updated successfully', settings });
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating media settings', error: error.message });
     }
 };

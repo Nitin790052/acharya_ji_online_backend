@@ -20,13 +20,21 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 150 * 1024 * 1024 } // 150MB limit
+});
+
+// Media Settings (Stats)
+router.get('/settings', mediaController.getMediaSettings);
+router.put('/settings', mediaController.updateMediaSettings);
 
 router.get('/', mediaController.getAllMedia);
 router.get('/type/:type', mediaController.getMediaByType);
-router.post('/', upload.single('image'), mediaController.createMedia);
-router.put('/:id', upload.single('image'), mediaController.updateMedia);
+router.post('/', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'video', maxCount: 1 }]), mediaController.createMedia);
+router.put('/:id', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'video', maxCount: 1 }]), mediaController.updateMedia);
 router.delete('/:id', mediaController.deleteMedia);
+router.get('/fetch-yt-metadata/:id', mediaController.fetchYTMetadata);
 router.post('/seed', mediaController.seedMedia);
 
 module.exports = router;
