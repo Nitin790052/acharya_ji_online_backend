@@ -23,6 +23,8 @@ const bookingRoutes = require('./routes/bookingRoutes');
 const bookPujaContentRoutes = require('./routes/bookPujaContentRoutes');
 const careerContentRoutes = require('./routes/careerContentRoutes');
 const mediaRoutes = require('./routes/mediaRoutes');
+const galleryRoutes = require('./routes/galleryRoutes');
+const contactSettingsRoutes = require('./routes/contactSettingsRoutes');
 
 dotenv.config();
 
@@ -33,7 +35,8 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '150mb' }));
+app.use(express.urlencoded({ limit: '150mb', extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
@@ -56,6 +59,8 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/book-puja-content', bookPujaContentRoutes);
 app.use('/api/career-content', careerContentRoutes);
 app.use('/api/media', mediaRoutes);
+app.use('/api/gallery', galleryRoutes);
+app.use('/api/contact-settings', contactSettingsRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is running...');
