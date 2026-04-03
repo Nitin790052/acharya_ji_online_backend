@@ -47,6 +47,7 @@ const pujaOfferingSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    imageAlt: { type: String, default: 'Sacred Puja Ritual' },
     isActive: {
         type: Boolean,
         default: true
@@ -54,7 +55,11 @@ const pujaOfferingSchema = new mongoose.Schema({
     order: {
         type: Number,
         default: 0
-    }
+    },
+    metaTitle: { type: String, maxLength: 70 },
+    metaDescription: { type: String, maxLength: 165 },
+    metaKeywords: { type: String },
+    canonicalUrl: { type: String },
 }, { timestamps: true });
 
 module.exports = mongoose.model('PujaOffering', pujaOfferingSchema);

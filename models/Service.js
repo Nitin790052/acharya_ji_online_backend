@@ -29,6 +29,7 @@ const ServiceSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    imageAlt: { type: String, default: 'Divine Spiritual Service' },
     isActive: {
         type: Boolean,
         default: true
@@ -36,7 +37,12 @@ const ServiceSchema = new mongoose.Schema({
     order: {
         type: Number,
         default: 0
-    }
+    },
+    slug: { type: String, lowercase: true, trim: true },
+    metaTitle: { type: String, maxLength: 70 },
+    metaDescription: { type: String, maxLength: 165 },
+    metaKeywords: { type: String },
+    canonicalUrl: { type: String },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Service', ServiceSchema);
