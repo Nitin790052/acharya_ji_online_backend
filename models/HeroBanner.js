@@ -35,6 +35,7 @@ const heroBannerSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    imageAlt: { type: String, default: 'Devotional Hero Banner' },
     pagePath: {
         type: String,
         default: '/', // default to home page
@@ -43,6 +44,10 @@ const heroBannerSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    metaTitle: { type: String, maxLength: 70 },
+    metaDescription: { type: String, maxLength: 165 },
+    metaKeywords: { type: String },
+    canonicalUrl: { type: String },
 }, { timestamps: true });
 
 module.exports = mongoose.model('HeroBanner', heroBannerSchema);
