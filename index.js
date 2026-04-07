@@ -68,6 +68,13 @@ app.use('/api/contact-settings', contactSettingsRoutes);
 app.use('/api/sitemap', sitemapRoutes);
 app.use('/api/seo', seoRoutes);
 
+const astrologyPageContentRoutes = require('./routes/astrologyPageContentRoutes');
+const kundliPageContentRoutes = require('./routes/kundliPageContentRoutes');
+const vastuPageContentRoutes = require('./routes/vastuPageContentRoutes');
+app.use('/api/astrology-content', astrologyPageContentRoutes);
+app.use('/api/kundli-content', kundliPageContentRoutes);
+app.use('/api/vastu-content', vastuPageContentRoutes);
+
 // SEO Redirect for sitemap
 app.get('/sitemap.xml', (req, res) => res.redirect('/api/sitemap'));
 
