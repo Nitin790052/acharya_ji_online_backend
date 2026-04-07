@@ -1,10 +1,74 @@
 const Navbar = require('../models/Navbar');
+const KundliPageContent = require('../models/KundliPageContent');
+const AstrologyPageContent = require('../models/AstrologyPageContent');
+const VastuPageContent = require('../models/VastuPageContent');
 
 // Get all navbar items
 const getNavbarItems = async (req, res) => {
     try {
-        const items = await Navbar.find().sort({ order: 1 });
-        res.status(200).json(items);
+        const items = await Navbar.find().sort({ order: 1 }).lean();
+        
+        // Dynamically fetch active pages from both Kundli and Astrology
+        const activeKundliPages = await KundliPageContent.find({ isActive: true }).sort('order').lean();
+        const activeAstrologyPages = await AstrologyPageContent.find({ isActive: true }).sort('order').lean();
+        const activeVastuPages = await VastuPageContent.find({ isActive: true }).sort('order').lean();
+        
+        const dynamicItems = items.map(item => {
+            let dynamicChildren = [];
+            
+            // Normalize label for matching
+            const label = (item.label || '').trim();
+
+            if (label === 'Kundli') {
+                dynamicChildren = activeKundliPages.map(page => ({
+                    label: page.pageName,
+                    href: `/kundli/${page.pageSlug}`,
+                    isDynamic: true
+                }));
+            } else if (label === 'Astrology Services') {
+                dynamicChildren = activeAstrologyPages.map(page => ({
+                    label: page.pageName,
+                    href: `/astrology/${page.pageSlug}`,
+                    isDynamic: true
+                }));
+            } else if (label === 'Vastu') {
+                dynamicChildren = activeVastuPages.map(page => ({
+                    label: page.pageName,
+                    href: `/vastu/${page.pageSlug}`,
+                    isDynamic: true
+                }));
+            }
+
+            if (dynamicChildren.length > 0) {
+                // Smart Merge: Update manual children with dynamic hrefs, then append new dynamic ones
+                const manualChildren = item.children || [];
+                const manualLabels = new Set(manualChildren.map(c => (c.label || '').toLowerCase().trim()));
+                
+                const dynamicLabelMap = new Map(dynamicChildren.map(dc => [(dc.label || '').toLowerCase().trim(), dc]));
+                
+                const updatedManualChildren = manualChildren.map(mc => {
+                    const labelLower = (mc.label || '').toLowerCase().trim();
+                    if (labelLower && dynamicLabelMap.has(labelLower)) {
+                        // If there's a dynamic slug available, overwrite the placeholder href
+                        return { ...mc, href: dynamicLabelMap.get(labelLower).href };
+                    }
+                    return mc;
+                });
+                
+                const uniqueDynamic = dynamicChildren.filter(dc => {
+                    return !manualLabels.has((dc.label || '').toLowerCase().trim());
+                });
+                
+                return {
+                    ...item,
+                    children: [...updatedManualChildren, ...uniqueDynamic]
+                };
+            }
+            
+            return item;
+        });
+
+        res.status(200).json(dynamicItems);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -39,14 +103,14 @@ const seedNavbarItems = async (req, res) => {
             order: 4,
             children: [
                 { label: 'Talk to Astrologer', href: '/astrologer' },
-                { label: 'Career Astrology', href: '#' },
-                { label: 'Marriage Astrology', href: '#' },
-                { label: 'Business Astrology', href: '#' },
-                { label: 'Health Astrology', href: '#' },
-                { label: 'Numerology', href: '#' },
-                { label: 'Tarot Reading', href: '#' },
-                { label: 'Palmistry', href: '#' },
-                { label: 'Gemstone Suggestion', href: '#' }
+                { label: 'Career Astrology', href: '/career-astrology' },
+                { label: 'Marriage Astrology', href: '/marriage-astrology' },
+                { label: 'Business Astrology', href: '/business-astrology' },
+                { label: 'Health Astrology', href: '/health-astrology' },
+                { label: 'Numerology', href: '/numerology' },
+                { label: 'Tarot Reading', href: '/tarot-reading' },
+                { label: 'Palmistry', href: '/palmistry' },
+                { label: 'Gemstone Suggestion', href: '/gemstone-suggestion' }
             ]
         },
         {
@@ -56,13 +120,13 @@ const seedNavbarItems = async (req, res) => {
             order: 5,
             children: [
                 { label: 'Get Your Kundli', href: '/kundli' },
-                { label: 'Kundli Matching', href: '#' },
-                { label: 'Manglik Dosh Check', href: '#' },
-                { label: 'Kaal Sarp Dosh', href: '#' },
-                { label: 'Pitru Dosh', href: '#' },
-                { label: 'Shani Sade Sati', href: '#' },
-                { label: 'Dasha Analysis', href: '#' },
-                { label: 'Kundli Remedies', href: '#' }
+                { label: 'Kundli Matching', href: '/kundli/kundli-matching' },
+                { label: 'Manglik Dosh Check', href: '/kundli/manglik-dosh-check' },
+                { label: 'Kaal Sarp Dosh', href: '/kundli/kaal-sarp-dosh' },
+                { label: 'Pitru Dosh', href: '/kundli/pitru-dosh' },
+                { label: 'Shani Sade Sati', href: '/kundli/shani-sade-sati' },
+                { label: 'Dasha Analysis', href: '/kundli/dasha-analysis' },
+                { label: 'Kundli Remedies', href: '/kundli/kundli-remedies' }
             ]
         },
         {
@@ -71,13 +135,13 @@ const seedNavbarItems = async (req, res) => {
             type: 'dropdown',
             order: 6,
             children: [
-                { label: 'Vastu Consultation', href: '/vastu-consultation' },
-                { label: 'Home / Office Vastu', href: '/home-office-vastu' },
-                { label: 'Feng Shui', href: '#' },
-                { label: 'Gemstones', href: '#' },
-                { label: 'Rudraksha', href: '#' },
-                { label: 'Yantra', href: '#' },
-                { label: 'Energized Products', href: '#' }
+                { label: 'Vastu Consultation', href: '/vastu/vastu-consultation' },
+                { label: 'Home / Office Vastu', href: '/vastu/home-office-vastu' },
+                { label: 'Feng Shui', href: '/vastu/feng-shui' },
+                { label: 'Gemstones', href: '/vastu/gemstones' },
+                { label: 'Rudraksha', href: '/vastu/rudraksha' },
+                { label: 'Yantra', href: '/vastu/yantra' },
+                { label: 'Energized Products', href: '/vastu/energized-products' }
             ]
         },
         {
